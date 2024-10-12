@@ -8,18 +8,19 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 
-// mongoose connect
-mongoose.connect('process.env.MONGODB_URL')
+// mongoose connect (fixed)
+mongoose.connect(process.env.MONGODB_URL) // Corrected this line
     .then(() => console.log('MongoDB Connected'))
-    .cathc(err => console.error('MongoDB Connection Failed', err))
+    .catch(err => console.error('MongoDB Connection Failed', err))
 
-// connect to server
-app.use(express.json())
-
+// connect to server 
+app.use(express.json())   
+ 
 // give access to connect to server
 app.use(cors())
 
 // gain access to my routes
+// Example: app.use('/api/users', userRoutes);
 
 // server connections
 app.listen(port, (error) => {
@@ -27,7 +28,6 @@ app.listen(port, (error) => {
         console.log(`Server connected on PORT ${port}`);
     }
     else {
-        console.log(` Error : ${error}`);
-
+        console.log(`Error: ${error}`);
     }
 })
