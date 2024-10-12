@@ -9,7 +9,7 @@ const cors = require('cors')
 require('dotenv').config()
 
 // mongoose connect (fixed)
-mongoose.connect(process.env.MONGODB_URL) // Corrected this line
+mongoose.connect(process.env.MONGODB_URL)
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.error('MongoDB Connection Failed', err))
 
@@ -21,6 +21,9 @@ app.use(cors())
 
 // gain access to my routes
 // Example: app.use('/api/users', userRoutes);
+
+app.use('auth', require('./routes/auth'))
+app.use('profile', require('./routes/profile'))
 
 // server connections
 app.listen(port, (error) => {

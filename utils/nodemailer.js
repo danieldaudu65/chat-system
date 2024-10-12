@@ -19,7 +19,7 @@ const sendOTP = async (email, otp) => {
   try {
     const info = await transport.sendMail({
       
-      from: `Backend Team <${process.env.MAIL_USER}>`,
+      from: `Campus Connect <${process.env.MAIL_USER}>`,
       to: email,
       subject: "One Time Password",
       html: `<p style="line-height: 1.5">
@@ -27,7 +27,7 @@ const sendOTP = async (email, otp) => {
         <font size="3px">${otp}</font> <br />
         Please note that this otp will be valid for 5 minutes
         Best regards,<br />
-        The Backend Team.
+        Campus Connect.
         </p>
         </div>`,
     });
