@@ -12,7 +12,13 @@ const transport = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false
   }
-});
+}); 
+
+console.log("MAIL_USER:", process.env.MAIL_USER);
+console.log("MAIL_PASS:", process.env.MAIL_PASS);
+
+
+
 
 
 const sendOTP = async (email, otp) => {

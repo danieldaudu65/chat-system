@@ -6,6 +6,8 @@ const router = express.Router();
 const User = require('../models/user');
 // const Faculty = require('../models/faculty');
 const sendOTP = require('../utils/nodemailer');
+require('dotenv').config();
+
 const { generateOTP, generateAlphanumericOTP } = require('../utils/generateOTP');
 
 // Sign up Endpoint for the chat
@@ -145,15 +147,16 @@ router.post('/email-login', async (req, res) => {
         res.status(500).send({ status: 'Internal Server Error' });
     }
 });
+
 router.post('/number-login', async (req, res) => {
-    const { number, password } = req.body;
+    const { phoneNumber, password } = req.body;
 
     try {
-        if (!number || !password) {
+        if (!phoneNumber || !password) {
             return res.status(400).send({ status: false, message: 'All fields must be filled' });
         }
 
-        const user = await User.findOne({ number });
+        const user = await User.findOne({ phoneNumber });
         if (!user) {
             return res.status(404).send({ status: false, message: 'User does not exist' });
         }

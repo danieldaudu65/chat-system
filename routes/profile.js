@@ -4,9 +4,9 @@ const router = express.Router();
 const sharp = require('sharp');
 const uploader = require('../utils/multer');
 const cloudinary = require('../utils/cloudinary');
+require('dotenv').config();
+
 const jwt = require('jsonwebtoken'); // Don't forget to import jwt for token verification
-
-
 
 
 router.post('/setpin', async (req, res) => {
@@ -18,7 +18,7 @@ router.post('/setpin', async (req, res) => {
             return res.status(400).send({ message: 'Please fill all the required fields' });
         }
         // verify for the user
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN_PASS);
 
         // Find user by id and delete
         const eUser = await user.findById(decoded._id);
@@ -44,6 +44,10 @@ router.post('/setpin', async (req, res) => {
 router.post('/upload-profile-pic', uploader.single('image'), async (req, res) => {
     const { token } = req.body;
 
+    console.log("Request Body:", req.body);  // Log the body
+    console.log("Uploaded File:", req.file);  // Log the uploaded file
+    
+
     try {
         // Check if a file was uploaded
         if (!req.file) {
@@ -64,7 +68,7 @@ router.post('/upload-profile-pic', uploader.single('image'), async (req, res) =>
             }
 
             // Retrieve the authenticated user
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded = jwt.verify(token, process.env.JWT_TOKEN_PASS);
             const eUser = await user.findById(decoded._id);
 
             if (!eUser) {
@@ -97,7 +101,7 @@ router.delete('/delete-profile-pic', async (req, res) => {
 
     try {
         // Verify token and find the user
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN_PASS);
         const eUser = await user.findById(decoded._id);
 
         if (!eUser) {
@@ -141,7 +145,7 @@ router.post('/edit-profile-pic', uploader.single('image'), async (req, res) => {
         }
 
         // Verify token and find the user
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN_PASS);
         const eUser = await user.findById(decoded._id);
 
         if (!eUser) {
@@ -198,7 +202,7 @@ router.put('/edit-profile', async (req, res) => {
 
     try {
         // Verify token to authenticate the user
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN_PASS);
         const eUser = await user.findById(decoded._id);
 
         if (!eUser) {
