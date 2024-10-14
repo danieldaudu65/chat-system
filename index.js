@@ -22,8 +22,8 @@ app.use(cors())
 // gain access to my routes
 // Example: app.use('/api/users', userRoutes);
 
-app.use('auth', require('./routes/auth'))
-app.use('profile', require('./routes/profile'))
+app.use('/auth', require('./routes/auth'))
+app.use('/profile', require('./routes/profile'))
 
 // server connections
 app.listen(port, (error) => {
