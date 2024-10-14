@@ -130,4 +130,105 @@ router.delete('/delete-profile-pic', async (req, res) => {
     }
 });
 
+// Edit (update) profile picture by deleting the old one, uploading a new one, and saving it in the user model
+router.post('/edit-profile-pic', uploader.single('image'), async (req, res) => {
+    const { token } = req.body;
+
+    try {
+        // Check if a file was uploaded
+        if (!req.file) {
+            return res.status(400).send({ status: 'error', msg: 'No file uploaded' });
+        }
+
+        // Verify token and find the user
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const eUser = await user.findById(decoded._id);
+
+        if (!eUser) {
+            return res.status(404).send('User not found');
+        }
+
+        // If the user already has an image, delete it from Cloudinary
+        if (eUser.image_id) {
+            await cloudinary.uploader.destroy(eUser.image_id, (error, result) => {
+                if (error) {
+                    console.error('Failed to delete old image from Cloudinary:', error);
+                    return res.status(500).send('Failed to delete old image from Cloudinary');
+                }
+            });
+        }
+
+        // Compress the new image using Sharp
+        const compressedImage = await sharp(req.file.path)
+            .resize({ width: 800 })
+            .toFormat('jpeg', { quality: 80 })
+            .toBuffer();
+
+        // Upload the compressed image to Cloudinary
+        cloudinary.uploader.upload_stream({ folder: 'profile-images' }, async (error, result) => {
+            if (error) {
+                console.error('Upload to Cloudinary failed:', error);
+                return res.status(500).send('Error uploading new image to Cloudinary');
+            }
+
+            // Save the new Cloudinary image URL and public_id to the user model
+            eUser.image = result.secure_url;
+            eUser.image_id = result.public_id;  // Store the new public_id
+
+            // Save the updated user document
+            await eUser.save();
+
+            // Respond with success message and new image URL
+            res.status(200).send({
+                success: 'Profile picture updated successfully',
+                imageUrl: result.secure_url
+            });
+        }).end(compressedImage);
+
+    } catch (error) {
+        console.error('Error editing profile picture:', error);
+        res.status(500).send('Error editing profile picture: ' + error.message);
+    }
+});
+
+
+// Edit profile information (first name, surname, date of birth)
+router.put('/edit-profile', async (req, res) => {
+    const { token, firstName, surname, DOB } = req.body;
+
+    try {
+        // Verify token to authenticate the user
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const eUser = await user.findById(decoded._id);
+
+        if (!eUser) {
+            return res.status(404).send('User not found');
+        }
+
+        // Update fields if provided
+        if (firstName) eUser.firstName = firstName;
+        if (surname) eUser.surname = surname;
+        if (DOB) eUser.DOB = DOB;
+
+        // Save the updated user document
+        await eUser.save();
+
+        // Respond with success message and updated user data
+        res.status(200).send({
+            success: 'Profile updated successfully',
+            user: {
+                firstName: eUser.firstName,
+                surname: eUser.surname,
+                DOB: eUser.DOB
+            }
+        });
+
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).send({ message: 'Error updating profile: ' + error.message });
+    }
+});
+
+
+
 module.exports = router;
