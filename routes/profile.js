@@ -196,7 +196,7 @@ router.post('/edit-profile-pic', uploader.single('image'), async (req, res) => {
 });
 
 
-// Edit profile information (first name, surname, date of birth)
+// Edit profile information (first name, surname, date of birth) 
 router.put('/edit-profile', async (req, res) => {
     const { token, firstName, surname, DOB } = req.body;
 

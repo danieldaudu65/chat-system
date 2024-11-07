@@ -24,6 +24,10 @@ app.use(cors())
 
 app.use('/auth', require('./routes/auth'))
 app.use('/profile', require('./routes/profile'))
+app.use('/users', require('./routes/users'))
+
+// admin routes
+app.use('/admin', require('./admin/routes/faculty'))
 
 // server connections
 app.listen(port, (error) => {
