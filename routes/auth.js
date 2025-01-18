@@ -84,7 +84,6 @@ router.post('/signup', async (req, res) => {
             otpTime: otpExpiration,
             userId
         });
-
         await newUser.save();
 
         res.status(201).send({ message: 'User created successfully. An OTP has been sent to your email.' });
